@@ -11,7 +11,7 @@ class PacketViaDMEM
       @opts   = opts_parse
       @debug  = @opts.debug?
     end
-    
+
     def run
       file = @opts.arguments.shift
       raise NoFile, 'filename is mandatory argument' unless file
@@ -20,7 +20,9 @@ class PacketViaDMEM
       rescue
         raise InvalidFile, "unable to read #{file}"
       end
-      puts PacketViaDMEM.new(:received=>@opts[:received], :sent=>@opts[:sent]).parse file
+      packets, headers = PacketViaDMEM.new(:received=>@opts[:received], :sent=>@opts[:sent]).parse file
+      $stderr.puts headers if @opts.headers?
+      puts packets
     end
 
     private
@@ -28,6 +30,7 @@ class PacketViaDMEM
     def opts_parse
       Slop.parse do |o|
         o.bool '-d', '--debug', 'turn on debugging'
+        o.bool '--headers', 'print headers to stderr'
         o.int  '-r', '--received', "pop BYTES from received frames, default #{PacketViaDMEM::HEADER_SIZE[:received]}", :default=>PacketViaDMEM::HEADER_SIZE[:received]
         o.int  '-s', '--sent',     "pop BYTES from senti frames, default is not to show sent frames"
         o.on   '-h', '--help' do puts o; exit; end

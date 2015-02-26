@@ -68,6 +68,72 @@ To capture say packets with IP address 10.11.12.13
     dmem = PacketViaDMEM.new
     puts dmem.parse File.read(ARGF[0])
 
+
+## Header format
+Potentially first is type
+  * 00 ?? ?? ?? source ??
+  * 10 ?? ?? ?? ?? ?? source ??
+
+Example receive headers, MX480
+    00 0b 40 60 41 08
+    00 01 c0 70 81 08
+    00 02 40 70 81 08
+    00 02 c0 70 81 08
+    10 03 40 70 05 40 81 08
+    00 03 c0 70 81 08
+    00 06 40 70 81 08
+    00 07 c0 70 81 08
+    00 08 47 f0 20 00
+    00 09 45 f0 20 00
+    00 09 c7 f0 80 00
+    00 0b c0 70 81 08
+    10 0c 08 00 02 00 1f 00
+    00 00 c0 70 81 08
+    00 01 47 f0 80 00
+    00 04 40 60 41 08
+    10 04 c0 70 01 50 81 08
+    00 05 40 70 81 08
+    00 05 c0 70 81 08
+    00 06 c5 f0 20 00
+    10 07 08 00 02 00 1f 00
+    00 08 c0 70 81 08
+    00 0a 40 70 81 08
+    00 0a c0 70 81 08
+    00 0b 47 f0 20 00
+    00 01 c0 70 81 08
+    00 02 40 60 41 08
+    00 07 c7 f0 b0 80
+
+Example receive headers, MX80
+    00 08 00 f0 81 08
+    10 08 80 f0 05 b4 81 08
+    10 09 00 f0 05 b4 81 08
+    10 09 80 f0 05 b4 81 08
+    00 0a 00 f0 92 08
+    10 0a 80 f0 05 b4 81 08
+    10 03 00 f0 05 b4 81 08
+    00 04 00 f0 81 08
+    10 04 80 f0 05 b4 81 08
+    10 05 00 f0 05 b4 81 08
+    10 05 80 f0 05 b4 81 08
+    00 06 00 f0 81 08
+    10 06 80 f0 05 b4 81 08
+    00 07 00 f0 80 08
+    10 07 80 f0 05 b4 81 08
+    10 0b 00 f0 02 28 81 08
+
+TAZ-TBB-0(X vty)# show ixchip ifd
+
+   IFD       IFD        IX     WAN       Ing Queue     Egr Queue
+  Index      Name       Id     Port      Rt/Ct/Be      H/L 
+  ======  ==========  ======  ======  ==============  ======
+   148     ge-1/0/0      2       0        0/32/64       0/32
+   149     ge-1/0/1      2       1        1/33/65       1/33
+   166     ge-1/1/8      2      18       18/50/82      18/50
+
+For this box, second to last byte, divmod 64, returns these ports, which are
+correct port for source.
+
 ## Todo
   1. correctly discover how many bytes need to be popped, perhaps by finding valid ethernet headers and ignore anything before?
   1. reverse engineer header/cookie, at least figuring out which fabric stream (And hence egress NPU) is going to be used should be trivial

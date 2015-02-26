@@ -70,6 +70,7 @@ To capture say packets with IP address 10.11.12.13
 
 
 ## Header format
+### Received header
 
   * First byte is type of header?
     * 00 'lu packet' (i.e. whole packet was sent for lookup, i.e. small packet)
@@ -147,7 +148,10 @@ correct port for source.
        149     ge-1/0/1      2       1        1/33/65       1/33
        166     ge-1/1/8      2      18       18/50/82      18/50
 
+### Sent header
+**FIXME**
 
 ## Todo
-  1. correctly discover how many bytes need to be popped, perhaps by finding valid ethernet headers and ignore anything before?
-  1. reverse engineer header/cookie, at least figuring out which fabric stream (And hence egress NPU) is going to be used should be trivial
+  1. reverse engineer sent headers (so we can pop them correctly)
+  1. reverse engineer cookie
+  1. more research on received headers source fabric, port, npu

@@ -70,13 +70,21 @@ To capture say packets with IP address 10.11.12.13
 
 
 ## Header format
-Potentially first byte is type of header
 
-  * 00 'lu packet' (i.e. whole packet was sent for lookup, i.e. small packet)
-  * 10 'lu packet head' (i.e. only head of packet was sent for lookup, i.e. large packet)
+  * First byte is type of header?
+    * 00 'lu packet' (i.e. whole packet was sent for lookup, i.e. small packet)
+    * 10 'lu packet head' (i.e. only head of packet was sent for lookup, i.e. large packet)
 
-  * 00 ?? ?? ?? source ??
-  * 10 ?? ?? ?? ?? ?? source ??
+  * Second and third byte appear to tell nothing about where packet came from,
+    but more when it came from. Timing? Counter? Randomness?
+
+  * Fourth byte is 0xf0 on MX80, tendency for last nibble to be 0. Perhaps src fabric stream?
+  * Fifth byte appears to be source port?
+
+  * Sixth byte is perhaps source NPU?
+
+  * 00 (22) (33) (44) source (66)
+  * 10 (22) (33) (44) (77) (88) source (66)
 
 Example receive headers, MX480
 

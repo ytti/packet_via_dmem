@@ -70,7 +70,11 @@ To capture say packets with IP address 10.11.12.13
 
 
 ## Header format
-Potentially first is type
+Potentially first byte is type of header
+
+  * 00 'lu packet' (i.e. whole packet was sent for lookup, i.e. small packet)
+  * 10 'lu packet head' (i.e. only head of packet was sent for lookup, i.e. large packet)
+
   * 00 ?? ?? ?? source ??
   * 10 ?? ?? ?? ?? ?? source ??
 

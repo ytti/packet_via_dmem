@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+
+begin
+  require_relative '../lib/packet_via_dmem/cli.rb'
+  cli = PacketViaDMEM::CLI.new
+  @debug = cli.debug
+  cli.run
+rescue => error
+  warn "#{error.message}"
+  raise if @debug
+end

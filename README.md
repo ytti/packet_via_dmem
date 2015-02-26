@@ -3,14 +3,14 @@ Finds junos packet-via-dmem packets from arbitrary output and generates text2pca
 
 ## JunOS
 To capture say packets with IP address 10.11.12.13
-    
+
     % ssh test2nqe31.dk|tee output.txt
     fisakytt@test2nqe31-re1.dk> start shell pfe network afeb0
 
     AFEB platform (1000Mhz QorIQ P2020 processor, 2048MB memory, 512KB flash)
     MX104-ABB-0(test2nqe31-re1.dk vty)# test jnh 0 packet-via-dmem enable
-    MX104-ABB-0(test2nqe31-re1.dk vty)# test jnh 0 packet-via-dmem 0x3 0x0a0b0c0d
-    MX104-ABB-0(test2nqe31-re1.dk vty)# test jnh 0 packet-via-dmem 0x0
+    MX104-ABB-0(test2nqe31-re1.dk vty)# test jnh 0 packet-via-dmem capture 0x3 0x0a0b0c0d
+    MX104-ABB-0(test2nqe31-re1.dk vty)# test jnh 0 packet-via-dmem capture 0x0
     MX104-ABB-0(test2nqe31-re1.dk vty)# test jnh 0 packet-via-dmem dump
     MX104-ABB-0(test2nqe31-re1.dk vty)# test jnh 0 packet-via-dmem disable
 
@@ -70,4 +70,4 @@ To capture say packets with IP address 10.11.12.13
 
 ## Todo
   1. correctly discover how many bytes need to be popped, perhaps by finding valid ethernet headers and ignore anything before?
-  1. reverse engineer header/cookie, at least figuring out which egress NPU is going to be used should be trivial
+  1. reverse engineer header/cookie, at least figuring out which fabric stream (And hence egress NPU) is going to be used should be trivial

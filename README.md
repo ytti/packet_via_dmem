@@ -83,8 +83,8 @@ To capture say packets with IP address 10.11.12.13
 
   * Sixth byte is perhaps source NPU?
 
-  * 00 (22) (33) (44) <src> (66)
-  * 10 (22) (33) (44) <si> <ze> <src> (66)
+  * 00 (22) (33) (44) \<src\> (66)
+  * 10 (22) (33) (44) \<si\> \<ze\> \<src\> (66)
 
 Example receive headers, MX480
 

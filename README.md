@@ -79,10 +79,11 @@ To capture say packets with IP address 10.11.12.13
   * Second and third byte appear to tell nothing about where packet came from,
     but more when it came from. Timing? Counter? Randomness?
 
-  * Fourth byte is 0xf0 on MX80, tendency for last nibble to be 0. Perhaps src fabric stream?
+  * Fourth byte is 0xf0 on MX80, tendency for last nibble to be 0. Perhaps src fabric stream? If it is zero, we get what seems to be trash (internal stuff?)
+
   * Fifth byte appears to be source port?
 
-  * Sixth byte is perhaps source NPU?
+  * Sixth byte is perhaps source NPU? If it is zero, we get what seems to be trash (internal stuff)
 
   * 00 (22) (33) (44) \<src\> (66)
   * 10 (22) (33) (44) \<si\> \<ze\> \<src\> (66)

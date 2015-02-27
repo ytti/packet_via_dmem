@@ -5,7 +5,9 @@ class PacketViaDMEM
   FAKE = {
     :dmac  => %w( 22 22 22 22 22 22 ),
     :smac  => %w( 66 66 66 66 66 66 ),
-    :etype => %w( 88 47 ),
+    :etype_mpls  => %w( 88 47 ),
+    :etype_ipv4  => %w( 08 00 ),
+    :ipv4        => %w( 45 ),
   }
   HEADER_SIZE = {
     :received => 6,
@@ -49,26 +51,53 @@ class PacketViaDMEM
   private
 
   def get_pop_push type, pkt
-   push = []
-   pop =  if type == :sent
-      case pkt.first.to_i(16)
-      when 0x00 # we're sending to fabric
-        # we may send MAC to fabric,byte 6, 7, 9, 11, 21?
-        if pkt[5].to_i(16) == 0xf0 # we don't send MAC to fabric
-          push = FAKE[:dmac] + FAKE[:smac] + FAKE[:etype]
-          24
-        else # we send MAC to fabric
-          33
-        end
-      when 0x08 then 13
-      else @sent
-      end
+    if type == :sent
+      get_pop_push_sent pkt
     else
-      case pkt.first.to_i(16)
-      when 0x00 then 6 #1,2,3,4,5,6
-      when 0x10 then 8 #1,2,3,4,7,8,5,6
-      else @received
+      get_pop_push_received pkt
+    end
+  end
+
+  def get_pop_push_sent pkt
+    pop, push = nil, []
+    case pkt.first.to_i(16)
+    when 0x00 # we're sending to fabric
+      # we may send MAC to fabric,byte 6, 7, 9, 11, 21?
+      if pkt[5].to_i(16) == 0xf0 # we don't send MAC to fabric
+        push = FAKE[:dmac] + FAKE[:smac] + FAKE[:etype_mpls]
+        pop = 24
+      else # we send MAC to fabric
+        pop = 33
       end
+    when 0x08 then pop = 13
+    else pop = @sent
+    end
+    [pop, push]
+  end
+
+  def get_pop_push_received pkt
+    pop, push = 6, []
+    offset = 0
+    case pkt.first.to_i(16)
+    when 0x00 then offset = 0 #1,2,3,4,5,6
+    when 0x10 then offset = 2 #1,2,3,4,7,8,5,6
+    else pop = @received
+    end
+    pop += offset
+    case pkt[4+offset..5+offset].join.to_i(16)
+    when 0x8000 then pop+=14
+    when 0x4220 # ae/802.1AX is special, no L2 received, but something extra
+      pop+=18
+      push = FAKE[:dmac] + FAKE[:smac] + FAKE[:etype_ipv4]
+    when 0x2000 # these were BFD packets from control-plane
+      pop+=5
+      push = FAKE[:dmac] + FAKE[:smac] + FAKE[:etype_ipv4]
+    # some BGP packets like this
+    # also SMB2 TCP Seq1 (maybe post ARP from control-plane?)
+    # they are misssing all of ipv4 headers before TTL
+    when 0x1f00
+      pop+=7
+      push = FAKE[:dmac] + FAKE[:smac] + FAKE[:etype_ipv4] + FAKE[:ipv4]
     end
     [pop, push]
   end

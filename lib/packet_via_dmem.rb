@@ -25,6 +25,7 @@ class PacketViaDMEM
   def parse str
     packets = []
     headers = []
+    originals = []
     @sc.string = str
     while @sc.scan_until PACKET
       match = @sc.matched.split(/\s+/)
@@ -38,14 +39,15 @@ class PacketViaDMEM
       end
       pkt = parse_packet pkt
       pop, push = get_pop_push(type, pkt)
-      header = pkt[0..pop-1]
-      pkt = pkt[pop..-1]
-      if pkt
-        packets << '000000 ' + [push, pkt].flatten.join(' ')
+      header  = pkt[0..pop-1]
+      payload = pkt[pop..-1]
+      if payload
+        packets << '000000 ' + [header, pkt].flatten.join(' ')
         headers << header.join(' ')
+        originals << pkt
       end
     end
-    [packets, headers]
+    [packets, headers, originals]
   end
 
   private

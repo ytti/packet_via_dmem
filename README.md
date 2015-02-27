@@ -58,15 +58,16 @@ To capture say packets with IP address 10.11.12.13
     % ./bin/packet-via-dmem --help
     usage: ./bin/packet-via-dmem [options]
         -d, --debug     turn on debugging
+        --headers       print headers to stderr
+        -o, --original  print original frames
         -r, --received  pop BYTES from received frames, default 6
         -s, --sent      pop BYTES from senti frames, default is not to show sent frames
         -h, --help
-    %
 
 ## Library
     require 'packet_via_dmem'
     dmem = PacketViaDMEM.new
-    puts dmem.parse File.read(ARGF[0])
+    packets, headers, originals = dmem.parse File.read(ARGF[0])
 
 
 ## Header format

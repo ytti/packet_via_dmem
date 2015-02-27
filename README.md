@@ -57,12 +57,16 @@ To capture say packets with IP address 10.11.12.13
     Read 28 potential packets, wrote 28 packets (4388 bytes).
     % ./bin/packet-via-dmem --help
     usage: ./bin/packet-via-dmem [options]
-        -d, --debug     turn on debugging
         --headers       print headers to stderr
         -o, --original  print original frames
-        -r, --received  pop BYTES from received frames, default 6
-        -s, --sent      pop BYTES from senti frames, default is not to show sent frames
+        -r, --received  print received frames only (DEFAULT)
+        -s, --sent      print sent frames only
+        -b, --both      print received and sent frames
+        --poprx         pop N bytes from received frames
+        --poptx         pop N bytes from sent frames
+        -d, --debug     turn on debugging
         -h, --help
+    %
 
 ## Library
     require 'packet_via_dmem'

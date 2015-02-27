@@ -23,9 +23,16 @@ class PacketViaDMEM
       packets = PacketViaDMEM.new(:received=>@opts[:received], :sent=>@opts[:sent]).parse file
       count = 0
       packets.each do |pkt|
-        next if pkt.type == :received and (not @opts[:received] or @opts[:received] < 1)
-        next if pkt.type == :sent     and (not @opts[:sent]     or @opts[:sent] < 1)
+        pop = false
+        if pkt.type == :received
+          next if @opts.sent?
+          pop = @opts[:poprx]
+        elsif pkt.type == :sent
+          next unless (@opts.sent? or @opts.both?)
+          pop = @opts[:poptx]
+        end
         packet = @opts.original? ? pkt.pretty_original : pkt.pretty_packet
+        packet = pkt.pretty pkt.pop(pop) if pop
         puts '### Packet %d ###' % [count+=1]
         puts packet
         $stderr.puts pkt.header.join(' ') if @opts.headers?
@@ -37,11 +44,14 @@ class PacketViaDMEM
 
     def opts_parse
       Slop.parse do |o|
-        o.bool '-d', '--debug',    'turn on debugging'
         o.bool       '--headers',  'print headers to stderr'
         o.bool '-o', '--original', 'print original frames'
-        o.int  '-r', '--received', "pop BYTES from received frames, default #{PacketViaDMEM::HEADER_SIZE[:received]}", :default=>PacketViaDMEM::HEADER_SIZE[:received]
-        o.int  '-s', '--sent',     "pop BYTES from senti frames, default is not to show sent frames"
+        o.bool '-r', '--received', 'print received frames only (DEFAULT)'
+        o.bool '-s', '--sent',     'print sent frames only'
+        o.bool '-b', '--both',     'print received and sent frames'
+        o.int        '--poprx',    'pop N bytes from received frames'
+        o.int        '--poptx',    'pop N bytes from sent frames'
+        o.bool '-d', '--debug',    'turn on debugging'
         o.on   '-h', '--help' do puts o; exit; end
       end
     end

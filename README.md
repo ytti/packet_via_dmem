@@ -87,7 +87,7 @@ To capture say packets with IP address 10.11.12.13
   * 00 (22) (33) (44) \<src\> (66)
   * 10 (22) (33) (44) \<si\> \<ze\> \<src\> (66)
 
-Example receive headers, MX960
+Example from MX960
 
     00 00 c0 30 80 08
     00 03 40 30 80 08
@@ -117,7 +117,7 @@ Example receive headers, MX960
     10 0b 80 48 05 ce 42 20
     10 01 c0 30 05 8c 80 08
 
-Example receive headers, MX480
+Example from MX480
 
     00 0b 40 60 41 08
     00 01 c0 70 81 08
@@ -148,7 +148,7 @@ Example receive headers, MX480
     00 02 40 60 41 08
     00 07 c7 f0 b0 80
 
-Example receive headers, MX80
+Example from MX80
 
     00 08 00 f0 81 08
     10 08 80 f0 05 b4 81 08
@@ -172,14 +172,92 @@ correct port for source.
 
     TAZ-TBB-0(X vty)# show ixchip ifd
        IFD       IFD        IX     WAN       Ing Queue     Egr Queue
-      Index      Name       Id     Port      Rt/Ct/Be      H/L 
+      Index      Name       Id     Port      Rt/Ct/Be      H/L
       ======  ==========  ======  ======  ==============  ======
        148     ge-1/0/0      2       0        0/32/64       0/32
        149     ge-1/0/1      2       1        1/33/65       1/33
        166     ge-1/1/8      2      18       18/50/82      18/50
 
 ### Sent header
-**FIXME**
+I'm really not sure about sent headers, need more data to figure out what is
+our type. For all my examples, when we sent frame without L2 headers for
+fabric, it was MPLS, but almost certainly it can be IPv4, IPv6, ARP etc too.
+Need data to know which header tells that. So we are going to pop wrong amount
+of bytes in many sent cases.
+
+  * first byte is output
+    * 0x00 == to fabric
+    * 0x08 == to wan
+
+  * byte 6, 7, 9, 11 or 21 probably defines type (different if we sent layer2 to fabric or if we don't)
+
+Example from MX960
+
+    00 bf e0 0d 71 f0 00 04 42 20 01 44 03 01 00 81 00 00 00 00 00 00 07 e9
+    00 bf e0 0f 71 f0 00 09 42 20 01 44 03 01 01 21 00 00 00 00 00 00 16 65
+    00 bf e0 14 11 f0 00 04 42 20 01 44 00 01 00 81 00 00 00 00 00 00 0b ad
+    00 bf e0 03 71 f0 00 04 42 20 01 44 03 01 00 81 00 00 00 00 00 00 04 06
+    00 bf e0 04 71 f0 00 00 42 20 01 44 03 01 00 01 00 00 00 00 00 00 24 42
+    00 bf e0 0a 71 f0 00 04 42 20 01 44 03 01 00 81 00 00 00 00 00 00 18 a4
+    00 a0 00 02 71 f0 00 04 42 20 01 44 03 01 00 81 00 00 00 00 00 00 0a 8f
+    00 bf e0 11 11 f0 00 04 42 20 01 44 00 01 00 81 00 00 00 00 00 00 04 00
+    00 bf e0 15 71 f0 00 04 42 20 01 44 03 01 00 81 00 00 00 00 00 00 1c 69
+    00 bf e0 1b 11 f0 00 04 42 20 01 44 00 01 00 81 00 00 00 00 00 00 0b ad
+    00 a0 00 16 71 f0 00 04 42 20 01 44 03 01 00 81 00 00 00 00 00 00 05 ec
+    00 bf e0 07 11 f0 00 04 42 20 01 44 00 01 00 81 00 00 00 00 00 00 0b ad
+    00 a0 00 01 11 f0 00 04 42 20 01 44 00 01 00 81 00 00 00 00 00 00 08 0a
+    00 a0 00 06 11 f0 00 04 42 20 01 44 00 01 00 81 00 00 00 00 00 00 08 0a
+    00 a0 00 0c 11 f0 00 04 42 20 01 44 00 01 00 81 00 00 00 00 00 00 08 0a
+    00 a0 00 0d 71 f0 00 00 42 20 01 44 03 01 00 01 00 00 00 00 00 00 24 06
+    08 bf e0 0f 70 00 00 08 b0 0e 80 03 0a
+    00 bf e0 0e 11 f0 00 04 42 20 01 44 00 01 00 81 00 00 00 00 00 00 06 6b
+    08 bf e0 12 10 00 00 08 b0 0e 80 03 0a
+    08 bf e0 14 10 00 00 08 b0 0e 80 03 0a
+    00 bf e0 04 71 f0 00 09 42 20 01 44 03 01 01 21 00 00 00 00 00 00 16 65
+
+Example from MX480
+
+    00 bf e0 16 10 00 03 f9 20 00 20 03 02 b0 03 7a 00 0e 00 42 80 00 00 20 0e 00 00 10 00 0c 00 00 00
+    00 bf e0 03 10 00 03 f8 20 40 20 00 20 10 03 7a 00 12 00 46 80 00 00 20 12 00 00 18 00 00 00 00 00
+    00 bf e0 04 10 00 03 f8 20 40 20 00 20 10 03 7a 00 12 00 46 80 00 00 20 12 00 00 18 00 00 00 00 00
+    08 bf e0 05 14 00 00 10 20 12 80 5a 28
+    08 a0 00 06 14 00 00 10 b0 12 80 5a 28
+    08 bf e0 07 14 00 00 10 20 12 80 5a 28
+    08 bf e0 0c 14 00 00 10 b0 12 80 5a 28
+    08 bf e0 0f 14 00 00 10 20 12 80 5a 28
+    08 bf e0 10 14 00 00 0b 20 12 80 33 2a
+    08 bf e0 12 14 00 00 0b 20 0e 80 33 2c
+    08 bf e0 13 14 00 00 08 00 00 80 00 be
+    08 bf e0 17 14 00 00 10 20 12 80 5a 28
+    08 bf e0 01 14 00 00 10 b0 12 80 5a 28
+    08 bf e0 02 14 00 00 08 00 00 80 00 be
+    08 a0 00 09 14 00 00 10 a0 12 80 5a 28
+    08 bf e0 0a 14 00 00 10 20 12 80 5a 28
+    08 bf e0 0b 14 00 00 10 a0 12 80 5a 28
+    08 bf e0 0d 14 00 00 0b 00 0e 80 33 2c
+    08 bf e0 11 14 00 00 10 b0 12 80 5a 28
+    08 bf e0 14 14 00 00 10 b0 12 80 5a 28
+    08 bf e0 15 14 00 00 10 20 12 80 5a 28
+    08 bf e0 16 14 00 00 0b 20 0e 80 33 2c
+
+Example from MX80
+
+    08 bf e0 10 11 00 00 00 70 0e 80 0a 1e
+    08 a0 00 11 11 00 00 00 70 0e 80 0a 1e
+    08 a0 00 12 11 00 00 00 70 0e 80 0a 1e
+    08 a0 00 13 11 00 00 00 10 0e 80 0a 1e
+    08 bf e0 14 11 00 00 00 70 12 80 0a 1e
+    08 a0 00 15 11 00 00 00 70 0e 80 0a 1e
+    08 bf e0 08 11 00 00 00 70 0e 80 0a 1e
+    08 a0 00 06 11 00 00 00 70 0e 80 0a 1e
+    08 a0 00 09 11 00 00 00 70 0e 80 0a 1e
+    08 a0 00 0a 11 00 00 00 70 0e 80 0a 1e
+    08 a0 00 0b 11 00 00 00 70 0e 80 0a 1e
+    08 bf e0 0c 11 00 00 00 70 0e 80 0a 1e
+    08 a0 00 0d 11 00 00 00 70 0e 80 0a 1e
+    08 bf e0 0e 71 00 00 08 10 0e 80 0a 32
+    08 a0 00 0f 11 00 00 00 70 0e 80 0a 1e
+    08 a0 00 16 11 00 00 00 70 0e 80 0a 1e
 
 ## Todo
   1. reverse engineer sent headers (so we can pop them correctly)

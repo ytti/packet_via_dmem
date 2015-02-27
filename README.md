@@ -14,14 +14,14 @@ To capture say packets with IP address 10.11.12.13
     MX104-ABB-0(test2nqe31-re1.dk vty)# test jnh 0 packet-via-dmem dump
     MX104-ABB-0(test2nqe31-re1.dk vty)# test jnh 0 packet-via-dmem disable
 
+## Install
+    % gem install packet_via_dmem
 
 ## CLI
-    % ./bin/packet-via-dmem  -s 1 ~/output.txt|wc -l
+    % ./bin/packet-via-dmem --both ~/output.txt|grep Packet|wc -l
     55
-    % ./bin/packet-via-dmem ~/output.txt |wc -l
+    % ./bin/packet-via-dmem ~/output.txt|grep Packet|wc -l
     28
-    % ./bin/packet-via-dmem -r 0 ~/output.txt |wc -l
-    0
     % ./bin/packet-via-dmem ~/output.txt|text2pcap - output.pcap
     Input from: Standard input
     Output to: output.pcap

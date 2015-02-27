@@ -67,7 +67,13 @@ To capture say packets with IP address 10.11.12.13
 ## Library
     require 'packet_via_dmem'
     dmem = PacketViaDMEM.new
-    packets, headers, originals = dmem.parse File.read(ARGF[0])
+    packets = dmem.parse File.read(ARGF[0])
+    packets.each do |capture|
+      p capture.type
+      p capture.packet
+      p capture.header
+      p capture.original
+    end
 
 
 ## Header format

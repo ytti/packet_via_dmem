@@ -20,41 +20,20 @@ class PacketViaDMEM
       rescue
         raise InvalidFile, "unable to read #{file}"
       end
-      packets, headers, originals = PacketViaDMEM.new(:received=>@opts[:received], :sent=>@opts[:sent]).parse file
-      if @opts.original?
-        originals.each_with_index do |original, index|
-          puts "Packet #{index+1}"
-          puts pretty_packet original
-          puts
-        end
-      else
-        $stderr.puts headers if @opts.headers?
-        puts packets
+      packets = PacketViaDMEM.new(:received=>@opts[:received], :sent=>@opts[:sent]).parse file
+      count = 0
+      packets.each do |pkt|
+        next if pkt.type == :received and (not @opts[:received] or @opts[:received] < 1)
+        next if pkt.type == :sent     and (not @opts[:sent]     or @opts[:sent] < 1)
+        packet = @opts.original? ? pkt.pretty_original : pkt.pretty_packet
+        puts '### Packet %d ###' % [count+=1]
+        puts packet
+        $stderr.puts pkt.header.join(' ') if @opts.headers?
+        puts
       end
     end
 
     private
-
-    def pretty_packet packet
-      offset = -16
-      out    = ''
-      packet.each_slice(16) do |slice|
-        hex, str = [], []
-        slice.each_slice(8) do |subslice|
-          hex << subslice
-          str << subslice.inject(' ') do |r, s|
-            int = s.to_i(16)
-            r + ((int > 31 and int < 127) ? int.chr : '.')
-          end
-        end
-        hex << [] if not hex[1]
-        hex.each do |h|
-          (8-h.size).times { h << '  ' }
-        end
-        out << "%04x  %s  %s   %s \n" % [offset+=16, hex[0].join(' '), hex[1].to_a.join(' '), str.join('  ')]
-      end
-      out
-    end
 
     def opts_parse
       Slop.parse do |o|

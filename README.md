@@ -101,7 +101,7 @@ To capture say packets with IP address 10.11.12.13
     * 0x4008, 0x4108, 0x8008, 0x8108, 0x9208 - no pop, DMAC follows
     * 0xb080 - too small packet, some internal stuff?
 
-  * 00 (22) (33) (44) \<ty\> \<pe\
+  * 00 (22) (33) (44) \<ty\> \<pe\>
   * 10 (22) (33) (44) \<si\> \<ze\> \<ty\> \<pe\>
 
 Example from MX960

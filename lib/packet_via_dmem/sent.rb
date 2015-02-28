@@ -44,8 +44,5 @@ class PacketViaDMEM
       popped_and_packet pkt, pop, push
     end
 
-    FABRIC = 0
-    WAN    = 8
-
   end
 end

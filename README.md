@@ -98,8 +98,8 @@ To capture say packets with IP address 10.11.12.13
 
   * value of fift+sixth seems to sometime indicate special cases
     * 0x1fff - Packet missing everything before IPv4 TTL, yet has some extra. I saw BGP from control-plane with this and also TCP/SMB2 with Seq1, it was transit, but perhaps it was via ARP resolve/punt and thus coming from control-plane?
-    * 0x2000 - BFD frames from control-plane, missing L2
-    * 0x4220 - Was traffic for AE/802.1AX, missing ethertype, MACs changed, 2 mystery bytes
+    * 0x2000 - BFD frames from control-plane or LACP IPv4, if next byte is 1 like below, if next byte is 0 missing MACs too (+5bytes)
+    * 0x4220 - Was LACP MPLS traffic, missing ethertype, MACs changed, 2 mystery bytes
     * 0x8000 - I need to pop 14 bytes extra
 
   * 00 (22) (33) (44) \<src\> (66)

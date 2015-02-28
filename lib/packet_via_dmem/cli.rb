@@ -35,7 +35,7 @@ class PacketViaDMEM
         end
         packet = @opts.original? ? pkt.pretty_original : pkt.pretty_packet
         packet = pkt.pretty pkt.pop(pop) if pop
-        puts '### Packet %d ###' % [count+=1]
+        puts '# Pkt#%d # %s' % [count+=1, pkt.header]
         puts packet
         $stderr.puts pkt.header.join(' ') if @opts.headers?
         puts

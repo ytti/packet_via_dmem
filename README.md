@@ -83,26 +83,21 @@ To capture say packets with IP address 10.11.12.13
 ## Header format
 ### Received header
 
-  * First byte is type of header?
-    * 00 'lu packet' (i.e. whole packet was sent for lookup, i.e. small packet)
-    * 10 'lu packet head' (i.e. only head of packet was sent for lookup, i.e. large packet)
+  * first four bits is message type
+    * 0 'lu packet' (i.e. whole packet was sent for lookup, i.e. small packet)
+    * 1 'lu packet head' (i.e. only head of packet was sent for lookup, i.e. large packet)
+  * next 13 bits is table entry (memory loc)
+  * next 11 bits is stream
+  * next 3 bits offset (for fabric cell sharing)
+  * next 17 bits is size (if message type is 1)
+  * next 8 bits is port
+  * next 8 bits is packet type
 
-  * Second and third byte appear to tell nothing about where packet came from,
-    but more when it came from. Timing? Counter? Randomness?
-
-  * Fourth byte is 0xf0 on MX80, tendency for last nibble to be 0. Perhaps src fabric stream? If it is zero, we get what seems to be trash (internal stuff?)
-
-  * Fift+Sixth seems to be type
-    * 0x1fff - Packet missing everything before IPv4 TTL, yet has some extra. I saw BGP from control-plane with this and also TCP/SMB2 with Seq1, it was transit, but perhaps it was via ARP resolve/punt and thus coming from control-plane?
-    * 0x2000, 0x4220
-      * LACP IPv4, LACP IPv6, next byte is 1, 2 mystery bytes, wrong MACs, missing etype
-      * 0x2000 + next byte 0 == 5 mystary bytes => control plane BFD
-    * 0x8000 - pop 14, packet from control-plane
-    * 0x4008, 0x4108, 0x8008, 0x8108, 0x9208 - no pop, DMAC follows
-    * 0xb080 - too small packet, some internal stuff?
-
-  * 00 (22) (33) (44) \<ty\> \<pe\>
-  * 10 (22) (33) (44) \<si\> \<ze\> \<ty\> \<pe\>
+  * packet type
+    * 0x00 real PITA, looks to be packets from control-plane, but amount of bytes that I need to pop I can't really figure out. I now rely on port# which likely isn't robust. This made me change my mind that 5th byte isn't port, but combined type, as it allowed, what seemed cleaner classification, but unfortunately it is not so.
+    * 0x08 is no-op, i don't need to pop anything, DMAC follows
+    * 0x20 this seems to be quite reliably mpls, i need to do some magic, as we're missing ethertype and my macs are wrong, there is also two extra bytes
+    * 0x80 is some short trash (payload 0xc013c6752759644ae0) no clue what it is
 
 Example from MX960
 

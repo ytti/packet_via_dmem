@@ -2,18 +2,18 @@ class PacketViaDMEM
 
   class Packet
     class NoPayload < Error; end
-    attr_reader :type, :packet, :header, :original
+    attr_reader :type, :packet, :header, :popped, :original
 
     def pop bytes
       @original[bytes..-1]
     end
 
-    def header_and_packet packet, pop_bytes, push_bytes
-      header  = packet[0..pop_bytes-1]
+    def popped_and_packet packet, pop_bytes, push_bytes
+      popped  = packet[0..pop_bytes-1]
       payload = packet[pop_bytes..-1]
       raise NoPayload, "no payload for #{packet}" unless payload
       payload = push_bytes + payload
-      [header, payload]
+      [popped, payload]
     end
 
     def to_s

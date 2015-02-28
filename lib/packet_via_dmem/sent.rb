@@ -1,3 +1,4 @@
+require_relative 'header/sent'
 class PacketViaDMEM
   class Sent < Packet
 
@@ -5,7 +6,8 @@ class PacketViaDMEM
       @debug           = debug
       @type            = :sent
       @original        = packet
-      @header, @packet = parse_packet packet
+      @header          = Header::Sent.new
+      @popped, @packet = parse_packet packet
     end
 
     private
@@ -24,7 +26,7 @@ class PacketViaDMEM
       when 0x08 then pop = 13
       else pop = @sent
       end
-      header_and_packet pkt, pop, push
+      popped_and_packet pkt, pop, push
     end
 
   end

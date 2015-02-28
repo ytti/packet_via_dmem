@@ -25,7 +25,7 @@ class PacketViaDMEM
         when :sent     then sent     << packet.packet.join
         else raise StandardError, "invalid type #{type}"
         end
-        headers   << packet.header.join
+        headers   << packet.header.to_s
         originals << packet.original.join
       end
       File.write('header-'   + name + '.txt', headers.join("\n"))

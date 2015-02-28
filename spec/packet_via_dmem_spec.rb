@@ -23,7 +23,7 @@ describe PacketViaDMEM do
       when 'received' then @received[name] = File.read(entry).split
       when 'sent'     then @sent[name]     = File.read(entry).split
       when 'original' then @original[name] = File.read(entry).split
-      when 'header'   then @header[name]   = File.read(entry).split
+      when 'header'   then @header[name]   = File.read(entry).split "\n"
       end
     end
   end
@@ -43,7 +43,7 @@ describe PacketViaDMEM do
     it 'produces correct headers' do
       @parsed.each do |name, packets|
         packets.each_with_index do |packet, index|
-          packet.header.join.must_equal @header[name][index], "header #{name} at line #{index+1}"
+          packet.header.to_s.must_equal @header[name][index], "header #{name} at line #{index+1}"
         end
         packets.size.must_equal @header[name].size, "header #{name} has incorrect amount of packets"
       end
@@ -76,7 +76,7 @@ describe PacketViaDMEM do
         packets.each_with_index do |packet, index|
           packet.original.join.must_equal @original[name][index], "original #{name} at line #{index+1}"
         end
-        packets.size.must_equal @header[name].size, "original #{name} has incorrect amount of packets"
+        packets.size.must_equal @original[name].size, "original #{name} has incorrect amount of packets"
       end
     end
 

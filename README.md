@@ -89,7 +89,8 @@ To capture say packets with IP address 10.11.12.13
   * next 13 bits is table entry (memory loc)
   * next 11 bits is stream
   * next 3 bits offset (for fabric cell sharing)
-  * next 17 bits is size (if message type is 1)
+  * next bit is size (17th bit, no way to test, would need >65k packets)
+  * next 16 bits is size (if message type is 1)
   * next 8 bits is port
   * next 8 bits is packet type
 

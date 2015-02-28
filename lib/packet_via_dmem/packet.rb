@@ -49,6 +49,61 @@ class PacketViaDMEM
       out
     end
 
+    private
+
+    def get_pop_push pkt, type, port, macs
+      pop, push = 0, []
+      case type
+      when *Type::MPLS
+        pop, push = general_pop_push(pkt, pop, macs, FAKE[:etype_mpls])
+      when *Type::SELF
+        pop, push = self_pop_push(pkt, port, macs, pop)
+      when *Type::NOPOP
+        # no op, DMAC follows
+      end
+      [pop, push]
+    end
+
+    def general_pop_push pkt, pop, macs, ether_type
+      pop += 2
+      if macs
+        pop+=12
+        push = FAKE[:dmac] + FAKE[:smac] + ether_type
+        #push = pkt[2..13] + ether_type
+        [pop, push]
+      else
+        pop+=3
+        push = FAKE[:dmac] + FAKE[:smac] + ether_type
+        [pop, push]
+      end
+    end
+
+    def self_pop_push pkt, port, macs, pop
+      push = []
+      case port
+      when 0x80
+        pop+=14
+      when 0x1f
+        pop+=7
+        push = FAKE[:dmac] + FAKE[:smac] + FAKE[:etype_ipv4] + FAKE[:ipv4]
+      else
+        if macs and port == 0x20
+          pop+=23
+        else
+          pop, push = general_pop_push(pkt, pop, macs, FAKE[:etype_ipv4])
+        end
+      end
+      [pop, push]
+    end
+
+
+
+    module Type
+      SELF  = [ 0x00, 0x40 ]
+      NOPOP = [ 0x08, 0x80 ]
+      MPLS  = [ 0x20 ]
+    end
+
 
   end
 end

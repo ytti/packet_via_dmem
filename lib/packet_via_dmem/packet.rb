@@ -51,7 +51,8 @@ class PacketViaDMEM
 
     private
 
-    def get_pop_push pkt, type, port, macs
+    def get_pop_push pkt, type, port
+      macs = pkt.first.to_i(16) > 0 # macs, maybe
       pop, push = 0, []
       case type
       when *Type::MPLS

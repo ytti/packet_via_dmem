@@ -35,10 +35,9 @@ class PacketViaDMEM
       pop, push = 0, []
       @header.port = pkt.shift.to_i(16)
       @header.type = pkt.shift.to_i(16)
-      macs = pkt.first.to_i(16) > 0 # macs, maybe..
-      # uuhhohh, msg_type is always 
+      # uuhhohh, msg_type is always 0, it's not fab/wan :(
       if not @header.statistics
-        pop, push = get_pop_push pkt, @header.type, @header.port, macs
+        pop, push = get_pop_push pkt, @header.type, @header.port
       else
         pop = 3
       end

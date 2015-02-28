@@ -68,8 +68,7 @@ class PacketViaDMEM
       pop += 2
       if macs
         pop+=12
-        push = FAKE[:dmac] + FAKE[:smac] + ether_type
-        #push = pkt[2..13] + ether_type
+        push = pkt[2..13] + ether_type
         [pop, push]
       else
         pop+=3

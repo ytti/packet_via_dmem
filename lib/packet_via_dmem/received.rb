@@ -15,9 +15,9 @@ class PacketViaDMEM
     def parse_packet pkt
       head = pkt.shift(4).join.to_i(16)
 
-      @header.msg_type = (head & 0xf0000000) >> 28
-      @header.table    = (head & 0xfff8000)  >> 15
-      @header.stream   = (head & 0x7ff0)     >> 4
+      @header.msg_type = (head & 0xffffffff) >> 28
+      @header.table    = (head & 0xfffffff)  >> 15
+      @header.stream   = (head & 0x7fff)     >> 4
       @header.offset   = (head & 0xe)        >> 1
       @header.size     = (head & 0x1)        << 16
 

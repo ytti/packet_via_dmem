@@ -76,7 +76,7 @@ describe PacketViaDMEM do
         packets.each_with_index do |packet, index|
           packet.original.join.must_equal @original[name][index], "original #{name} at line #{index+1}"
         end
-        packets.size.must_equal @header[name].size, "header #{name} has incorrect amount of packets"
+        packets.size.must_equal @header[name].size, "original #{name} has incorrect amount of packets"
       end
     end
 

@@ -19,9 +19,12 @@ class PacketViaDMEM
       pop += offset
       case pkt[4+offset..5+offset].join.to_i(16)
       when 0x8000 then pop+=14
-      when 0x4220 # ae/802.1AX is special, no L2 received, but something extra
-        pop+=18
-        push = FAKE[:dmac] + FAKE[:smac] + FAKE[:etype_ipv4]
+      # ae/802.1AX is special, I seem to have 2 bytes I don't know
+      # and ethertype missing, and MAC is weird, mpls labels are present
+      # i'd need example carrying IPv4/IPv6 instead of MPLS to decide those two bytes
+      when 0x4220
+        pop+=14 #pop macs and weird two bytes (return macs in push)
+        push = pkt[8+offset..19+offset] + FAKE[:etype_mpls]
       when 0x2000 # these were BFD packets from control-plane
         pop+=5
         push = FAKE[:dmac] + FAKE[:smac] + FAKE[:etype_ipv4]

@@ -92,18 +92,17 @@ To capture say packets with IP address 10.11.12.13
 
   * Fourth byte is 0xf0 on MX80, tendency for last nibble to be 0. Perhaps src fabric stream? If it is zero, we get what seems to be trash (internal stuff?)
 
-  * Fifth byte appears to be source port?
-
-  * Sixth byte is perhaps source NPU? If it is zero, we get what seems to be trash (internal stuff)
-
-  * value of fift+sixth seems to sometime indicate special cases
+  * Fift+Sixth seems to be type
     * 0x1fff - Packet missing everything before IPv4 TTL, yet has some extra. I saw BGP from control-plane with this and also TCP/SMB2 with Seq1, it was transit, but perhaps it was via ARP resolve/punt and thus coming from control-plane?
-    * 0x2000 - BFD frames from control-plane or LACP IPv4, if next byte is 1 like below, if next byte is 0 missing MACs too (+5bytes)
-    * 0x4220 - Was LACP MPLS traffic, missing ethertype, MACs changed, 2 mystery bytes
-    * 0x8000 - I need to pop 14 bytes extra
+    * 0x2000, 0x4220
+      * LACP IPv4, LACP IPv6, next byte is 1, 2 mystery bytes, wrong MACs, missing etype
+      * 0x2000 + next byte 0 == 5 mystary bytes => control plane BFD
+    * 0x8000 - pop 14, packet from control-plane
+    * 0x4008, 0x4108, 0x8008, 0x8108, 0x9208 - no pop, DMAC follows
+    * 0xb080 - too small packet, some internal stuff?
 
-  * 00 (22) (33) (44) \<src\> (66)
-  * 10 (22) (33) (44) \<si\> \<ze\> \<src\> (66)
+  * 00 (22) (33) (44) \<ty\> \<pe\
+  * 10 (22) (33) (44) \<si\> \<ze\> \<ty\> \<pe\>
 
 Example from MX960
 
@@ -184,17 +183,6 @@ Example from MX80
     00 07 00 f0 80 08
     10 07 80 f0 05 b4 81 08
     10 0b 00 f0 02 28 81 08
-
-For this box, second to last byte, divmod 64, returns these ports, which are
-correct port for source.
-
-    TAZ-TBB-0(X vty)# show ixchip ifd
-       IFD       IFD        IX     WAN       Ing Queue     Egr Queue
-      Index      Name       Id     Port      Rt/Ct/Be      H/L
-      ======  ==========  ======  ======  ==============  ======
-       148     ge-1/0/0      2       0        0/32/64       0/32
-       149     ge-1/0/1      2       1        1/33/65       1/33
-       166     ge-1/1/8      2      18       18/50/82      18/50
 
 ### Sent header
 I'm really not sure about sent headers, need more data to figure out what is

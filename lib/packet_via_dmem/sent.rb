@@ -1,7 +1,8 @@
 class PacketViaDMEM
   class Sent < Packet
 
-    def initialize packet
+    def initialize packet, debug
+      @debug           = debug
       @type            = :sent
       @original        = packet
       @header, @packet = parse_packet packet

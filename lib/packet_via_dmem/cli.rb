@@ -20,7 +20,9 @@ class PacketViaDMEM
       rescue
         raise InvalidFile, "unable to read #{file}"
       end
-      packets = PacketViaDMEM.new(:received=>@opts[:received], :sent=>@opts[:sent]).parse file
+      packets = PacketViaDMEM.new(:received=>@opts.received?,
+                                  :sent=>@opts.sent?,
+                                  :debug=>@opts.debug?).parse file
       count = 0
       packets.each do |pkt|
         pop = false

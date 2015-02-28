@@ -18,12 +18,13 @@ class PacketViaDMEM
   def initialize opts={}
     @received   = opts.delete :received
     @sent       = opts.delete :sent
+    @debug      = opts.delete :debug
     @received ||= HEADER_SIZE[:received]
     @sc         = StringScanner.new ''
   end
 
   def parse str
-    packets = Packets.new
+    packets = Packets.new @debug
     @sc.string = str
     while @sc.scan_until PACKET
       match = @sc.matched.split(/\s+/)

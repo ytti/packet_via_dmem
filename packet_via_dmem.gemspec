@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name              = 'packet_via_dmem'
-  s.version           = '0.0.7'
+  s.version           = '0.0.8'
   s.licenses          = %w( Apache-2.0 )
   s.platform          = Gem::Platform::RUBY
   s.authors           = [ 'Saku Ytti' ]

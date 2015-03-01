@@ -14,6 +14,19 @@ To capture say packets with IP address 10.11.12.13
     MX104-ABB-0(test2nqe31-re1.dk vty)# test jnh 0 packet-via-dmem dump
     MX104-ABB-0(test2nqe31-re1.dk vty)# test jnh 0 packet-via-dmem disable
 
+ * in capture the 0x3 sets flags for what type of packets we want, for 0x3 we
+   set two flags on, 'Packet' and 'PacketHead' (show mqchip N lo stats). These
+   two cover all real traffic.
+
+ * after capture flags we can set up-to 8 bytes of data to match anywhere in
+   32B window
+
+ * after match trigger we have optional 3rd argument which gives the byte
+   offset where our 32B window starts from, default to 0. If you're capturing
+   IPv6, the DADDR won't fit in the first 32B window, so you might give offest
+   of say 19B to get DADDR there too (in case of L2 MAC headers, without VLAN
+   or MPLS)
+
 ## Install
     % gem install packet_via_dmem
 
@@ -181,17 +194,7 @@ Example from MX80
     10 0b 00 f0 02 28 81 08
 
 ### Sent header
-I'm really not sure about sent headers, need more data to figure out what is
-our type. For all my examples, when we sent frame without L2 headers for
-fabric, it was MPLS, but almost certainly it can be IPv4, IPv6, ARP etc too.
-Need data to know which header tells that. So we are going to pop wrong amount
-of bytes in many sent cases.
-
-  * first byte is output
-    * 0x00 == to fabric
-    * 0x08 == to wan
-
-  * byte 6, 7, 9, 11 or 21 probably defines type (different if we sent layer2 to fabric or if we don't)
+  *FIXME* check the source...
 
 Example from MX960
 

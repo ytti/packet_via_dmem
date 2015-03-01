@@ -21,21 +21,29 @@ class Header
                   :magic2,
                   :magic3
 
-    def to_s
-      type_str = 'unk'
-      type_str = 'wan' if msg_type == 8
-      type_str = 'fab' if msg_type == 0
-      flags = ''
-      flags << (statistics ? 'S' : 's')
-      flags << (increment_reference ? 'I' : 'i')
-      flags << (fragment_info ? 'F' : 'f')
-      flags << (drop_hash ? 'H' : 'h')
-      flags << (decrement_reference ? 'D' : 'd')
-      flags << (prequeue_priority ? 'P' : 'p')
-      #"TX: magic %d,%d   popped %d" % [(magic1 or -1), (magic2 or -1), (popped or -1)]
-      "TX: %s # %s # P:%d(%s) # Ty:%x # Q(%d@%d) # C:%d # D:%d # O:%d # T:%d # L:%d" %
-        [ type_str, flags, port, port.divmod(64).join('/'), type, queue_number,
-          queue_system, color, queue_drop_opcode, offset, table, life ]
+    def to_s(packet_number=1)
+      str = ''
+      str << '# TX %03d # ' % packet_number
+      str << (statistics ? 'S' : 's')
+      str << (increment_reference ? 'I' : 'i')
+      str << (fragment_info ? 'F' : 'f')
+      str << (drop_hash ? 'H' : 'h')
+      str << (decrement_reference ? 'D' : 'd')
+      str << (prequeue_priority ? 'P' : 'p')
+      str << ' # '
+      str << 'port: %d (%s) # '   % [port, port.divmod(64) ]
+      str << 'type: %d # '        % type
+      str << 'QoS: %d@%d # '      % [queue_number, queue_system]
+      str << "QueueDropOp: %d\n"  % [queue_drop_opcode]
+      str << '#          '
+      str << 'color: %d # '       % color
+      str << 'offset: %d # '      % offset
+      str << 'table: %d # '       % table
+      str << 'life: %d # '        % life
+      str << 'magic: '
+      str << '%x/%x'              % [magic1, magic2] if magic1
+      str << '/%x'                % magic3 if magic3
+      str
     end
   end
 end

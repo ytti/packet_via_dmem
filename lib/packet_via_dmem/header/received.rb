@@ -12,12 +12,18 @@ class Header
                   :magic2,
                   :magic3   # this is sent only AFAIK, but guarded here just in case
 
-    def to_s
-      ssize = ''
-      ssize = "size: %d # " % size if msg_type > 0
-      #"RX: magic %d,%d   popped %d" % [(magic1 or -1), (magic2 or -1), (popped or -1)]
-      "RX: %sport: %d (%s) # strm: %d # type: 0x%x # tbl: %d # o: %d" %
-        [ ssize, port, port.divmod(64).join('/'), stream, type, table, offset ]
+    def to_s(packet_number=1)
+      str = ''
+      str << '# RX %03d # '     % packet_number
+      str << 'bytes: %d # '     % size if msg_type > 0
+      str << 'stream: %d # '    % stream
+      str << 'port: %d (%s) # ' % [port, port.divmod(64).join('/')]
+      str << "type: %d\n"       % type
+      str << '#          '
+      str << 'table: %d # '     % table
+      str << 'offset: %d # '    % offset
+      str << 'magic: %x/%x'     % [magic1, magic2] if magic1
+      str
     end
   end
 end

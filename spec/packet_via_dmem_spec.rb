@@ -43,7 +43,7 @@ describe PacketViaDMEM do
     it 'produces correct headers' do
       @parsed.each do |name, packets|
         packets.each_with_index do |packet, index|
-          packet.header.to_s.must_equal @header[name][index], "header #{name} at line #{index+1}"
+          packet.header.to_s.split(/\n/).join('---').must_equal @header[name][index], "header #{name} at line #{index+1}"
         end
         packets.size.must_equal @header[name].size, "header #{name} has incorrect amount of packets"
       end

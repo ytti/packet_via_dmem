@@ -7,15 +7,15 @@ class PacketViaDMEM
     include Enumerable
     class InvalidType < Error; end
 
-    def initialize debug
-      @debug   = debug
+    def initialize log
+      @log    = log
       @packets = []
     end
 
     def add packet, type
       packet = case type
-      when :received then Received.new packet, @debug
-      when :sent     then Sent.new packet, @debug
+      when :received then Received.new packet, @log
+      when :sent     then Sent.new packet, @log
       else raise InvalidType, "#{type} not valid packet type"
       end
       @packets << packet

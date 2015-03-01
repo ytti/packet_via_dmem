@@ -78,7 +78,7 @@ class PacketViaDMEM
         header.magic3 = pkt.shift.to_i(16)
         [ 0, [] ]
       else
-        $stderr.puts "unknown magic1: (%x/%x), type: %x, port: %x'" % [header.magic1, header.magic2, header.type, header.port] if @debug
+        @log.warn "unknown magic1: (%x/%x), type: %x, port: %x'" % [header.magic1, header.magic2, header.type, header.port]
         [ 0, [] ]
       end
     end
@@ -94,7 +94,7 @@ class PacketViaDMEM
         push = FAKE[:dmac] + FAKE[:smac] + FAKE[:etype_ipv4]
         [ 3, push ]
       else
-        $stderr.puts "unknown port: magic: (%x/%x), type: %x, port: %x'" % [header.magic1, header.magic2, header.type, header.port] if @debug
+        @log.warn "unknown port: magic: (%x/%x), type: %x, port: %x'" % [header.magic1, header.magic2, header.type, header.port]
         [ 0, [] ]
       end
     end

@@ -2,8 +2,8 @@ require_relative 'header/received'
 class PacketViaDMEM
   class Received < Packet
 
-    def initialize packet, debug
-      @debug                    = debug
+    def initialize packet, log
+      @log                      = log
       @type                     = :received
       @original                 = packet.dup
       @header                   = Header::Received.new

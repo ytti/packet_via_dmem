@@ -8,8 +8,9 @@ class PacketViaDMEM
     attr_reader :debug
 
     def initialize
-      @opts   = opts_parse
-      @debug  = @opts.debug?
+      @opts      = opts_parse
+      @log       = Logger.new STDERR
+      @log.level = Logger::INFO unless @opts.debug?
     end
 
     def run
@@ -22,7 +23,7 @@ class PacketViaDMEM
       end
       packets = PacketViaDMEM.new(:received=>@opts.received?,
                                   :sent=>@opts.sent?,
-                                  :debug=>@opts.debug?).parse file
+                                  :log=>@log).parse file
       count = 0
       packets.each do |pkt|
         pop = false
@@ -37,7 +38,7 @@ class PacketViaDMEM
         packet = pkt.pretty pkt.pop(pop) if pop
         puts pkt.header.to_s count+=1
         puts packet
-        $stderr.puts pkt.header.join(' ') if @opts.headers?
+        $stderr.puts pkt.popped.join(' ') if @opts.popped?
         puts
       end
     end
@@ -46,7 +47,7 @@ class PacketViaDMEM
 
     def opts_parse
       Slop.parse do |o|
-        o.bool       '--headers',  'print headers to stderr'
+        o.bool       '--popped',   'print popped bytes to stderr'
         o.bool '-o', '--original', 'print original frames'
         o.bool '-r', '--received', 'print received frames only (DEFAULT)'
         o.bool '-s', '--sent',     'print sent frames only'

@@ -1,4 +1,5 @@
 require 'strscan'
+require 'logger'
 
 class PacketViaDMEM
   PACKET = /^(Received|Sent) \d+ byte parcel:.*\n/
@@ -18,13 +19,17 @@ class PacketViaDMEM
   def initialize opts={}
     @received   = opts.delete :received
     @sent       = opts.delete :sent
-    @debug      = opts.delete :debug
+    @log        = opts.delete :log
+    if not @log
+      @log = Logger.new STDERR
+      @log.level = Logger::FATAL
+    end
     @received ||= HEADER_SIZE[:received]
     @sc         = StringScanner.new ''
   end
 
   def parse str
-    packets = Packets.new @debug
+    packets = Packets.new @log
     @sc.string = str
     while @sc.scan_until PACKET
       match = @sc.matched.split(/\s+/)

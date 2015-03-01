@@ -2,8 +2,8 @@ require_relative 'header/sent'
 class PacketViaDMEM
   class Sent < Packet
 
-    def initialize packet, debug
-      @debug           = debug
+    def initialize packet, log
+      @log             = log
       @type            = :sent
       @original        = packet.dup
       @header          = Header::Sent.new

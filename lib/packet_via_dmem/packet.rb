@@ -54,13 +54,12 @@ class PacketViaDMEM
     def get_pop_push pkt, header
       header.port = pkt.shift.to_i(16)
       header.type = pkt.shift.to_i(16)
-      case header.type
-      when *Type::MPLS, *Type::SELF, *Type::SENT
+      if Type::NOPOP.include? header.type # no-op, DMAC follows
+        [0, []]
+      else # *Type::MPLS, *Type::SELF, *Type::SENT (But be robust for unexpected)
         header.magic1 = pkt.shift.to_i(16)
         header.magic2 = pkt.shift.to_i(16)
         magic pkt, header
-      when *Type::NOPOP  # no-op, DMAC follows
-        [0, []]
       end
     end
 

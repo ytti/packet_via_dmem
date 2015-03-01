@@ -17,6 +17,8 @@ To capture say packets with IP address 10.11.12.13
  * in capture the 0x3 sets flags for what type of packets we want, for 0x3 we
    set two flags on, 'Packet' and 'PacketHead' (show mqchip N lo stats). These
    two cover all real traffic.
+   1. Packet     (whole packet seen)
+   2. PacketHead (334B packet, inclusive internal headers)
 
  * after capture flags we can set up-to 8 bytes of data to match anywhere in
    32B window

@@ -69,7 +69,9 @@ class PacketViaDMEM
       when 0x00 # the super dodgy one
         magic_self pkt, header
       when 0x01 # we're missing ethertype, need more data to discover etype
-        push = pkt[0..11] + FAKE[:etype_mpls]
+        etype = FAKE[:etype_ipv4]
+        etype = FAKE[:etype_mpls] if Type::MPLS.include? header.type
+        push = pkt[0..11] + etype
         [ 12 , push ]
       when 0x20 # we have extra crap
         [ 21, [] ]

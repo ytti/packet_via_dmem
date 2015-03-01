@@ -20,17 +20,13 @@ class PacketViaDMEM
       @header.stream   = (head & 0x7fff)     >> 4
       @header.offset   = (head & 0xe)        >> 1
       @header.size     = (head & 0x1)        << 16
-
       @header.size    += pkt.shift(2).join.to_i(16) if @header.msg_type == PACKET_HEAD
-      @header.port     = pkt.shift.to_i(16)
-      @header.type     = pkt.shift.to_i(16)
 
       pop, push = get_pop_push pkt, @header
-      @header.popped = pop
       popped_and_packet pkt, pop, push
     end
 
-    PACKET = 0
+    PACKET      = 0
     PACKET_HEAD = 1
   end
 end

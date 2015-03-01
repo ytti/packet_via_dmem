@@ -8,9 +8,9 @@ class Header
                   :size,
                   :port,
                   :type,
-                  :popped,
                   :magic1,
-                  :magic2
+                  :magic2,
+                  :magic3   # this is sent only AFAIK, but guarded here just in case
 
     def to_s
       ssize = ''

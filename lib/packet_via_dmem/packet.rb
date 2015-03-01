@@ -52,8 +52,10 @@ class PacketViaDMEM
     end
 
     def get_pop_push pkt, header
+      header.port = pkt.shift.to_i(16)
+      header.type = pkt.shift.to_i(16)
       case header.type
-      when *Type::MPLS, *Type::SELF
+      when *Type::MPLS, *Type::SELF, *Type::SENT
         header.magic1 = pkt.shift.to_i(16)
         header.magic2 = pkt.shift.to_i(16)
         magic pkt, header
@@ -64,13 +66,16 @@ class PacketViaDMEM
 
     def magic pkt, header
       case header.magic1
-      when 0x0
+      when 0x00 # the super dodgy one
         magic_self pkt, header
-      when 0x1
+      when 0x01 # we're missing ethertype, need more data to discover etype
         push = pkt[0..11] + FAKE[:etype_mpls]
         [ 12 , push ]
-      when 0x20
+      when 0x20 # we have extra crap
         [ 21, [] ]
+      when 0x80 # sent... only?
+        header.magic3 = pkt.shift.to_i(16)
+        [ 0, [] ]
       end
     end
 
@@ -91,8 +96,9 @@ class PacketViaDMEM
 
     module Type
       SELF  = [ 0x00, 0x40 ]
-      NOPOP = [ 0x08, 0x80 ]
       MPLS  = [ 0x20 ]
+      SENT  = [ 0x12, 0x0e ]
+      NOPOP = [ 0x08, 0x80 ]
     end
 
   end

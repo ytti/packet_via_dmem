@@ -32,16 +32,7 @@ class PacketViaDMEM
       @header.life                = (head & 0x7fffff)   >> 21
       @header.queue_number        = (head & 0x1fffff)
 
-      pop, push = 0, []
-      @header.port = pkt.shift.to_i(16)
-      @header.type = pkt.shift.to_i(16)
-      # uuhhohh, msg_type is always 0, it's not fab/wan :(
-      if not @header.statistics
-        pop, push = get_pop_push pkt, @header
-      else
-        pop = 3
-      end
-      @header.popped = pop
+      pop, push = get_pop_push pkt, @header
       popped_and_packet pkt, pop, push
     end
 

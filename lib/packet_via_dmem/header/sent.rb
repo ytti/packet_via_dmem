@@ -17,9 +17,9 @@ class Header
                   :queue_number,
                   :port,
                   :type,
-                  :popped,
                   :magic1,
-                  :magic2
+                  :magic2,
+                  :magic3
 
     def to_s
       type_str = 'unk'

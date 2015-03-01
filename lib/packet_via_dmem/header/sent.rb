@@ -31,8 +31,8 @@ class Header
       str << (decrement_reference ? 'D' : 'd')
       str << (prequeue_priority ? 'P' : 'p')
       str << ' # '
-      str << 'port: %d (%s) # '   % [port, port.divmod(64) ]
-      str << 'type: %d # '        % type
+      str << 'port: %x (%s) # '   % [port, port.divmod(64) ]
+      str << 'type: %x # '        % type
       str << 'QoS: %d@%d # '      % [queue_number, queue_system]
       str << "QueueDropOp: %d\n"  % [queue_drop_opcode]
       str << '#          '

@@ -9,8 +9,9 @@ class PacketViaDMEM
 
     def initialize
       @opts      = opts_parse
+      @debug     = @opts.debug?
       @log       = Logger.new STDERR
-      @log.level = Logger::INFO unless @opts.debug?
+      @log.level = Logger::INFO unless @debug
     end
 
     def run

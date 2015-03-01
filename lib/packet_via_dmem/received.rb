@@ -25,7 +25,8 @@ class PacketViaDMEM
       @header.port     = pkt.shift.to_i(16)
       @header.type     = pkt.shift.to_i(16)
 
-      pop, push = get_pop_push pkt, @header.type, @header.port
+      pop, push = get_pop_push pkt, @header
+      @header.popped = pop
       popped_and_packet pkt, pop, push
     end
 

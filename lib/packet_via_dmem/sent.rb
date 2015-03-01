@@ -37,10 +37,11 @@ class PacketViaDMEM
       @header.type = pkt.shift.to_i(16)
       # uuhhohh, msg_type is always 0, it's not fab/wan :(
       if not @header.statistics
-        pop, push = get_pop_push pkt, @header.type, @header.port
+        pop, push = get_pop_push pkt, @header
       else
         pop = 3
       end
+      @header.popped = pop
       popped_and_packet pkt, pop, push
     end
 

@@ -51,13 +51,18 @@ class PacketViaDMEM
 
     private
 
-    def get_pop_push pkt, type, port
+    def get_pop_push pkt, header
+      type, port = header.type, header.port
       macs = pkt.first.to_i(16) > 0 # macs, maybe
       pop, push = 0, []
       case type
       when *Type::MPLS
+        header.magic1 = pkt.shift.to_i(16)
+        header.magic2 = pkt.shift.to_i(16)
         pop, push = general_pop_push(pkt, pop, macs, FAKE[:etype_mpls])
       when *Type::SELF
+        header.magic1 = pkt.shift.to_i(16)
+        header.magic2 = pkt.shift.to_i(16)
         pop, push = self_pop_push(pkt, port, macs, pop)
       when *Type::NOPOP
         # no op, DMAC follows
@@ -66,10 +71,10 @@ class PacketViaDMEM
     end
 
     def general_pop_push pkt, pop, macs, ether_type
-      pop += 2
+      #pop+=2
       if macs
         pop+=12
-        push = pkt[2..13] + ether_type
+        push = pkt[0..11] + ether_type
         [pop, push]
       else
         pop+=3
@@ -82,13 +87,13 @@ class PacketViaDMEM
       push = []
       case port
       when 0x80
-        pop+=14
+        pop+=12
       when 0x1f
-        pop+=7
+        pop+=5
         push = FAKE[:dmac] + FAKE[:smac] + FAKE[:etype_ipv4] + FAKE[:ipv4]
       else
         if macs and port == 0x20
-          pop+=23
+          pop+=21
         else
           pop, push = general_pop_push(pkt, pop, macs, FAKE[:etype_ipv4])
         end

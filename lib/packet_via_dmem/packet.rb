@@ -8,14 +8,6 @@ class PacketViaDMEM
       @original[bytes..-1]
     end
 
-    def popped_and_packet packet, pop_bytes, push_bytes
-      popped  = packet[0..pop_bytes-1]
-      payload = packet[pop_bytes..-1]
-      raise NoPayload, "no payload for #{packet}" unless payload
-      payload = push_bytes + payload
-      [popped, payload]
-    end
-
     def to_s
       pretty_packet
     end
@@ -51,64 +43,57 @@ class PacketViaDMEM
 
     private
 
+    def popped_and_packet packet, pop_bytes, push_bytes
+      popped  = packet[0..pop_bytes-1]
+      payload = packet[pop_bytes..-1]
+      raise NoPayload, "no payload for #{packet}" unless payload
+      payload = push_bytes + payload
+      [popped, payload]
+    end
+
     def get_pop_push pkt, header
-      type, port = header.type, header.port
-      macs = pkt.first.to_i(16) > 0 # macs, maybe
-      pop, push = 0, []
-      case type
-      when *Type::MPLS
+      case header.type
+      when *Type::MPLS, *Type::SELF
         header.magic1 = pkt.shift.to_i(16)
         header.magic2 = pkt.shift.to_i(16)
-        pop, push = general_pop_push(pkt, pop, macs, FAKE[:etype_mpls])
-      when *Type::SELF
-        header.magic1 = pkt.shift.to_i(16)
-        header.magic2 = pkt.shift.to_i(16)
-        pop, push = self_pop_push(pkt, port, macs, pop)
-      when *Type::NOPOP
-        # no op, DMAC follows
-      end
-      [pop, push]
-    end
-
-    def general_pop_push pkt, pop, macs, ether_type
-      #pop+=2
-      if macs
-        pop+=12
-        push = pkt[0..11] + ether_type
-        [pop, push]
-      else
-        pop+=3
-        push = FAKE[:dmac] + FAKE[:smac] + ether_type
-        [pop, push]
+        magic pkt, header
+      when *Type::NOPOP  # no-op, DMAC follows
+        [0, []]
       end
     end
 
-    def self_pop_push pkt, port, macs, pop
-      push = []
-      case port
+    def magic pkt, header
+      case header.magic1
+      when 0x0
+        magic_self pkt, header
+      when 0x1
+        push = pkt[0..11] + FAKE[:etype_mpls]
+        [ 12 , push ]
+      when 0x20
+        [ 21, [] ]
+      end
+    end
+
+    def magic_self pkt, header
+      case header.port
       when 0x80
-        pop+=12
+        [ 12 , [] ]
       when 0x1f
-        pop+=5
         push = FAKE[:dmac] + FAKE[:smac] + FAKE[:etype_ipv4] + FAKE[:ipv4]
+        [ 5, push ]
+      when 0x20
+        push = FAKE[:dmac] + FAKE[:smac] + FAKE[:etype_ipv4]
+        [ 3, push ]
       else
-        if macs and port == 0x20
-          pop+=21
-        else
-          pop, push = general_pop_push(pkt, pop, macs, FAKE[:etype_ipv4])
-        end
+        $stderr.puts "magic_self: magic: (%x/%x), port: %x'" % [header.magic1, header.magic2, header.port] if @debug
       end
-      [pop, push]
     end
-
-
 
     module Type
       SELF  = [ 0x00, 0x40 ]
       NOPOP = [ 0x08, 0x80 ]
       MPLS  = [ 0x20 ]
     end
-
 
   end
 end

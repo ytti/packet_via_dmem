@@ -32,10 +32,10 @@ class Header
       flags << (drop_hash ? 'H' : 'h')
       flags << (decrement_reference ? 'D' : 'd')
       flags << (prequeue_priority ? 'P' : 'p')
-      "TX: magic %d,%d   popped %d" % [(magic1 or -1), (magic2 or -1), (popped or -1)]
-      #"TX: %s # %s # P:%d(%s) # Ty:%x # Q(%d@%d) # C:%d # D:%d # O:%d # T:%d # L:%d" %
-      #  [ type_str, flags, port, port.divmod(64).join('/'), type, queue_number,
-      #    queue_system, color, queue_drop_opcode, offset, table, life ]
+      #"TX: magic %d,%d   popped %d" % [(magic1 or -1), (magic2 or -1), (popped or -1)]
+      "TX: %s # %s # P:%d(%s) # Ty:%x # Q(%d@%d) # C:%d # D:%d # O:%d # T:%d # L:%d" %
+        [ type_str, flags, port, port.divmod(64).join('/'), type, queue_number,
+          queue_system, color, queue_drop_opcode, offset, table, life ]
     end
   end
 end

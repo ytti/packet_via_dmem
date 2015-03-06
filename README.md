@@ -83,6 +83,11 @@ To capture say packets with IP address 10.11.12.13
         -h, --help
     %
 
+You can also read from STDIN for live capture, some thing like this should work:
+
+    % sshfs nms: nms
+    % tail -fn 10000 nms/output.txt|packet-via-dmem -|text2pcap - -|wireshark -k -i -
+
 ## Library
     require 'packet_via_dmem'
     dmem = PacketViaDMEM.new

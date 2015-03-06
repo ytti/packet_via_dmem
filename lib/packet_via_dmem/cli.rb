@@ -15,18 +15,13 @@ class PacketViaDMEM
     end
 
     def run
-      file = @opts.arguments.shift
-      raise NoFile, 'filename is mandatory argument' unless file
-      begin
-        file = File.read(file)
-      rescue
-        raise InvalidFile, "unable to read #{file}"
-      end
-      packets = PacketViaDMEM.new(:received=>@opts.received?,
-                                  :sent=>@opts.sent?,
-                                  :log=>@log).parse file
+      file = get_file if not @opts.stdin?
+      dmem = PacketViaDMEM.new :received=>@opts.received?,
+                               :sent=>@opts.sent?,
+                               :log=>@log
+
       count = 0
-      packets.each do |pkt|
+      block = Proc.new do |pkt|
         pop = false
         if pkt.type == :received
           next if @opts.sent?
@@ -42,12 +37,24 @@ class PacketViaDMEM
         $stderr.puts pkt.popped.join(' ') if @opts.popped?
         puts
       end
+      packets = @opts.stdin? ? dmem.stream($stdin, &block) : dmdm.parse(file).each(&block)
     end
 
     private
 
+    def get_file
+      file = @opts.arguments.shift
+      raise NoFile, 'filename is mandatory argument' unless file
+      begin
+        file = File.read(file)
+      rescue
+        raise InvalidFile, "unable to read #{file}"
+      end
+    end
+
     def opts_parse
       Slop.parse do |o|
+        o.bool '-',  '--stdin',    'stream from STDIN'
         o.bool       '--popped',   'print popped bytes to stderr'
         o.bool '-o', '--original', 'print original frames'
         o.bool '-r', '--received', 'print received frames only (DEFAULT)'

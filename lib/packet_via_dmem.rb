@@ -28,6 +28,20 @@ class PacketViaDMEM
     @sc         = StringScanner.new ''
   end
 
+  def stream io
+    packet = ''
+    while not io.eof?
+      line = io.readline
+      if line.match PACKET
+        packet = parse(packet).first
+        yield packet if packet
+        packet = line
+      else
+        packet << line
+      end
+    end
+  end
+
   def parse str
     packets = Packets.new @log
     @sc.string = str
@@ -42,6 +56,7 @@ class PacketViaDMEM
       pkt = parse_packet pkt
       packets.add pkt, type
     end
+    @sc.string = ''
     packets
   end
 

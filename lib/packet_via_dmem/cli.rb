@@ -37,7 +37,7 @@ class PacketViaDMEM
         $stderr.puts pkt.popped.join(' ') if @opts.popped?
         puts
       end
-      packets = @opts.stdin? ? dmem.stream($stdin, &block) : dmdm.parse(file).each(&block)
+      packets = @opts.stdin? ? dmem.stream($stdin, &block) : dmem.parse(file).each(&block)
     end
 
     private

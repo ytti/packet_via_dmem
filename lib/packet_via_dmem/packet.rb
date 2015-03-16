@@ -93,6 +93,8 @@ class PacketViaDMEM
       when 0x20
         push = FAKE[:dmac] + FAKE[:smac] + FAKE[:etype_ipv4]
         [ 3, push ]
+      when 0x83
+        [ 2, [] ]
       else
         @log.warn "unknown port: magic: (%x/%x), type: %x, port: %x'" % [header.magic1, header.magic2, header.type, header.port]
         [ 0, [] ]

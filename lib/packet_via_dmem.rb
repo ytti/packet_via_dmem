@@ -1,5 +1,6 @@
 require 'strscan'
 require 'logger'
+require 'pry'
 
 class PacketViaDMEM
   PACKET = /^(Received|Sent) \d+ byte parcel:.*\n/
@@ -51,7 +52,7 @@ class PacketViaDMEM
       @sc.scan_until(/\n/) if type == :received
       pkt = ''
       while @sc.match?(/^0x/)
-        pkt << @sc.scan_until(/\n/).strip
+        pkt << (@sc.scan_until(/\n/) || @sc.scan_until(/$/)).strip
       end
       pkt = parse_packet pkt
       packets.add pkt, type

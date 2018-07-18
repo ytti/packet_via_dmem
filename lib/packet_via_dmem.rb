@@ -51,7 +51,7 @@ class PacketViaDMEM
       @sc.scan_until(/\n/) if type == :received
       pkt = ''
       while @sc.match?(/^0x/)
-        pkt << (@sc.scan_until(/\n/) || @sc.scan_until(/$/)).strip
+        pkt << @sc.scan_until(/\n?$/).strip
       end
       pkt = parse_packet pkt
       packets.add pkt, type

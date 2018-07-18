@@ -1,6 +1,5 @@
 require 'strscan'
 require 'logger'
-require 'pry'
 
 class PacketViaDMEM
   PACKET = /^(Received|Sent) \d+ byte parcel:.*\n/
